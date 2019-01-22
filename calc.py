@@ -1,13 +1,14 @@
 import tkinter as tk
 from functools import partialmethod
-#TODO: make keyboard shortucts available
-#TODO: make window`s scaling
 class Calculator:
     def __init__(self, master):
         self.master = master
         self.strvar = tk.StringVar()
         self.label = tk.Label(master, textvariable = self.strvar)
+        self.master.bind('<Key>', self.keyboard_2_label)
         self.label.grid(row = 1, column = 1, columnspan = 5)
+        self.master.resizable(0, 0)
+
         
         self.div_button = self.configure_button('/', self.print_2_label('/'), 2, 1)
         self.mul_button = self.configure_button('*', self.print_2_label('*'), 2, 2)
@@ -23,11 +24,13 @@ class Calculator:
         self.seven_button = self.configure_button('7', self.print_2_label('7'), 5, 1)
         self.eight_button = self.configure_button('8', self.print_2_label('8'), 5, 2)
         self.nine_button = self.configure_button('9', self.print_2_label('9'), 5, 3)
+        self.nine_button = self.configure_button('(', self.print_2_label('('), 4, 5)
+        self.nine_button = self.configure_button(')', self.print_2_label(')'), 5, 5)
         self.backspace_button = self.configure_button('<-', self.backspace_label(), 4, 4)
         self.clear_button = self.configure_button('DEL', self.clear_label(), 5, 4)
-        self.eval_button = self.configure_button('=', self.eval_label(), 2, 5)
+        self.eval_button = self.configure_button('=', self.eval_label(), 2, 6)
         self.pow_button = self.configure_button('^', self.print_2_label('^'), 3, 5)
-        self.dot_button = self.configure_button('.', self.print_2_label('.'), 3, 5)
+        self.dot_button = self.configure_button('.', self.print_2_label('.'), 2, 5)
     def configure_button(self, text, command, row, column):
         button = tk.Button(self.master, text = text, command = command)
         button.grid(row = row, column = column, sticky = 'WE')
@@ -55,6 +58,17 @@ class Calculator:
             except SyntaxError:
                 self.strvar.set('ERROR')
         return _
+    def keyboard_2_label(self, event):
+        print(event)
+        char = event.char
+        if event.keysym == 'Return':
+            self.eval_label()()
+        elif  event.keysym == 'BackSpace':
+            self.backspace_label()()
+        elif event.keysym == 'Delete':
+            self.clear_label()()
+        else:
+            self.print_2_label(event.char)()
 
 if __name__ == '__main__':
     root = tk.Tk()

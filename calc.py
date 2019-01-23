@@ -8,7 +8,7 @@ class Calculator:
         self.master.bind('<Key>', self.keyboard_2_label)
         self.label.grid(row = 1, column = 1, columnspan = 5)
         self.master.resizable(0, 0)
-        self.symbols = set(('/', '+', '-', '.', '*', '^', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')'))
+
         
         self.div_button = self.configure_button('/', self.print_2_label('/'), 2, 1)
         self.mul_button = self.configure_button('*', self.print_2_label('*'), 2, 2)
@@ -67,9 +67,7 @@ class Calculator:
             self.backspace_label()()
         elif event.keysym == 'Delete':
             self.clear_label()()
-        elif event.char in self.symbols:
-        """eval is dangerous, so i limited set
-        of characters that can be evaluated"""
+        else:
             self.print_2_label(event.char)()
 
 if __name__ == '__main__':

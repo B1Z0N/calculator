@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+import re
 from form import Ui_Form
 from PyQt5.QtGui import (
     QWindow,
@@ -13,9 +14,35 @@ from PyQt5.QtWidgets import (
 
 
 class Calculator(QWidget, Ui_Form):
+    def update(self): return self.display.setText(str(self.exprstr))
+
+    def addsym(self, sym):
+        self.exprstr += str(sym)
+        self.update()
+
+    def _eval(self):
+        if len(self.exprstr) > 0:
+            try:
+                self.exprstr = str(eval(self.exprstr))
+                self.display.setText(self.exprstr)
+            except:
+                self.display.setText(':ERR:')
+            self.exprstr = ''
+
+    def dellast(self):
+        self.exprstr = self.exprstr[:(len(self.exprstr) - 1)]
+        self.update()
+
+
+    def dellall(self):
+        self.exprstr = ''
+        self.display.setText('0')
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.show()
+        self.validSymbols = re.compile(r'[^\d\-\+\.\/\*\^\(\)]')
         self.exprstr = ''
 
         # centering window
@@ -24,30 +51,12 @@ class Calculator(QWidget, Ui_Form):
         qtRectangle.moveCenter(centerPoint)
         self.move(qtRectangle.topLeft())
 
-        update = lambda: self.display.setText(str(self.exprstr))
+        addsym = self.addsym
+        update = self.update
+        dellast = self.dellast
+        dellall = self.dellall
+        _eval = self._eval
 
-
-        def addsym(sym):
-            self.exprstr += str(sym)
-            update()
-
-        def _eval():
-            try:
-                self.exprstr = str(eval(self.exprstr))
-            except:
-                self.display.setText(':ERR:')
-                self.exprstr = ''
-            # self.exprstr = str(eval(self.exprstr))
-            # update()
-
-        def dellast():
-            self.exprstr = self.exprstr[:(len(self.exprstr) - 1)]
-            update()
-
-        def dellall():
-            self.exprstr = ''
-            self.display.setText('0')
-    
         self.one.clicked.connect(lambda: addsym(1))
         self.two.clicked.connect(lambda: addsym(2))
         self.three.clicked.connect(lambda: addsym(3))
@@ -74,9 +83,19 @@ class Calculator(QWidget, Ui_Form):
 
         self.deletebtn.clicked.connect(dellall)
 
+    def keyPressEvent(self, event):
+        char = event.text()
+        key = event.key()
+        modif = event.modifiers()
+        if self.validSymbols.search(char) == None:
+            self.addsym(char)
+        if key == 16777220:
+            self._eval()
+        elif key == 16777219:
+            self.dellast()
+
 
 app = QApplication(sys.argv)
 
 calc = Calculator()
-calc.show()
 sys.exit(app.exec())

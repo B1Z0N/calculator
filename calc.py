@@ -1,15 +1,16 @@
 import tkinter as tk
-from functools import partialmethod
+
+
 class Calculator:
     def __init__(self, master):
         self.master = master
         self.strvar = tk.StringVar()
-        self.label = tk.Label(master, textvariable = self.strvar)
+        self.label = tk.Label(master, textvariable=self.strvar)
         self.master.bind('<Key>', self.keyboard_2_label)
-        self.label.grid(row = 1, column = 1, columnspan = 5)
+        self.label.grid(row=1, column=1, columnspan=5)
         self.master.resizable(0, 0)
-        self.symbols = set(('/', '+', '-', '.', '*', '^', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')'))
-        
+        self.symbols = {'/', '+', '-', '.', '*', '^', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')'}
+
         self.div_button = self.configure_button('/', self.print_2_label('/'), 2, 1)
         self.mul_button = self.configure_button('*', self.print_2_label('*'), 2, 2)
         self.minus_button = self.configure_button('-', self.print_2_label('-'), 2, 3)
@@ -31,25 +32,33 @@ class Calculator:
         self.eval_button = self.configure_button('=', self.eval_label(), 2, 6)
         self.pow_button = self.configure_button('^', self.print_2_label('^'), 3, 5)
         self.dot_button = self.configure_button('.', self.print_2_label('.'), 2, 5)
+
     def configure_button(self, text, command, row, column):
-        button = tk.Button(self.master, text = text, command = command)
-        button.grid(row = row, column = column, sticky = 'WE')
+        button = tk.Button(self.master, text=text, command=command)
+        button.grid(row=row, column=column, sticky='WE')
         return button
+
     def print_2_label(self, text):
         def _():
             nonlocal self, text
             self.strvar.set(self.strvar.get() + text)
+
         return _
+
     def backspace_label(self):
         def _():
             nonlocal self
             self.strvar.set(self.strvar.get()[:-1])
+
         return _
+
     def clear_label(self):
         def _():
             nonlocal self
             self.strvar.set('')
+
         return _
+
     def eval_label(self):
         def _():
             nonlocal self
@@ -57,20 +66,21 @@ class Calculator:
                 self.strvar.set(str(eval(self.strvar.get().replace('^', '**'))))
             except SyntaxError:
                 self.strvar.set('ERROR')
+
         return _
+
     def keyboard_2_label(self, event):
-        print(event)
-        char = event.char
         if event.keysym == 'Return':
             self.eval_label()()
-        elif  event.keysym == 'BackSpace':
+        elif event.keysym == 'BackSpace':
             self.backspace_label()()
         elif event.keysym == 'Delete':
             self.clear_label()()
         elif event.char in self.symbols:
-        """eval is dangerous, so i limited set
-        of characters that can be evaluated"""
+            """eval is dangerous, so i limited set
+            of characters that can be evaluated"""
             self.print_2_label(event.char)()
+
 
 if __name__ == '__main__':
     root = tk.Tk()
